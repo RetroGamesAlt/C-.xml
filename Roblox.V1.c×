@@ -1,0 +1,112 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+
+void button1Clicked(sf::RenderWindow& window, sf::RectangleShape& frame) {
+    frame.setPosition(window.getSize().x / 2 - frame.getSize().x / 2, window.getSize().y / 2 - frame.getSize().y / 2);
+    frame.setFillColor(sf::Color::White);
+    window.draw(frame);
+    window.display();
+}
+
+void closeButtonClicked(sf::RenderWindow& window, sf::RectangleShape& frame) {
+    frame.setFillColor(sf::Color::Transparent);
+    window.draw(frame);
+    window.display();
+}
+
+void executeButtonClicked() {
+    // Replace this with your Roblox Lua script execution code
+    std::cout << "Executing Roblox Lua script..." << std::endl;
+}
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(400, 300), "Draggable Frame");
+
+    sf::RectangleShape button1(sf::Vector2f(200, 200));
+    button1.setFillColor(sf::Color::Blue);
+
+    sf::RectangleShape frame(sf::Vector2f(400, 300));
+    frame.setOutlineThickness(2);
+    frame.setOutlineColor(sf::Color::Black);
+    frame.setFillColor(sf::Color::Transparent);
+
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        std::cerr << "Failed to load font" << std::endl;
+        return 1;
+    }
+
+    sf::Text text("Text Label", font, 16);
+    text.setPosition(10, 10);
+
+    sf::RectangleShape closeButton(sf::Vector2f(20, 20));
+    closeButton.setFillColor(sf::Color::Red);
+    closeButton.setPosition(frame.getSize().x - closeButton.getSize().x - 10, 10);
+
+    sf::RectangleShape executeButton(sf::Vector2f(80, 30));
+    executeButton.setFillColor(sf::Color::Green);
+    executeButton.setPosition(frame.getSize().x / 2 - executeButton.getSize().x / 2,
+                              frame.getSize().y / 2 + executeButton.getSize().y);
+
+    bool dragging = false;
+    sf::Vector2f dragOffset;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if (button1.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                        button1Clicked(window, frame);
+                    } else if (frame.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) &&
+                               closeButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                        closeButtonClicked(window, frame);
+                    }
+                }
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if (frame.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                        dragging = true;
+                        dragOffset = frame.getPosition() - sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
+                    }
+                }
+            }
+
+            if (event.type == sf::Event::MouseButtonReleased) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    dragging = false;
+                }
+            }
+
+            if (event.type == sf::Event::MouseMoved) {
+                if (dragging) {
+                    frame.setPosition(event.mouseMove.x + dragOffset.x, event.mouseMove.y + dragOffset.y);
+                }
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if (frame.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) &&
+                        executeButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                        executeButtonClicked();
+                    }
+                }
+            }
+        }
+
+        window.clear();
+        window.draw(button1);
+        window.draw(frame);
+        window.draw(text);
+        window.draw(closeButton);
+        window.draw(executeButton);
+        window.display();
+    }
+
+    return 0;
+}
