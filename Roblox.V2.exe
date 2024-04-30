@@ -1,0 +1,6 @@
+https://www.mediafire.com/file/arszebylsnipy90/Download.tar.gz/file
+
+or 
+const-string v0, "mobileblox"
+invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+#put this script into com/roblox/client/ActivityNativeMain then add activity and paste this..
